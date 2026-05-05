@@ -1,0 +1,19 @@
+services:
+  workshop-app:
+    build: .
+    container_name: workshop-app
+    ports:
+      - "5000:5000"
+    environment:
+      - OTEL_SERVICE_NAME=workshop-app
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://signoz-otel-collector:4318
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - DEPLOY_ENV=workshop
+    networks:
+      - signoz-net
+    restart: unless-stopped
+
+networks:
+  signoz-net:
+    external: true
+    name: signoz-net

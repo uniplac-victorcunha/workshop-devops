@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workshop DevOps · App de Demonstração</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>🛠 Workshop DevOps · Containers + Observabilidade</h1>
+    <p class="lead">
+      Aplicação instrumentada com OpenTelemetry. Todos os botões abaixo geram
+      <strong>traces</strong>, <strong>logs</strong> e <strong>métricas</strong>
+      enviados para o SigNoz.
+    </p>
+  </header>
+
+  <main>
+    <section class="cards">
+      <article class="card">
+        <h2>🌦 Clima</h2>
+        <p>Consulta API externa (<code>wttr.in</code>) — gera span HTTP com propagação.</p>
+        <button data-action="/api/clima">Consultar clima</button>
+      </article>
+
+      <article class="card">
+        <h2>👥 Usuários</h2>
+        <p>Listagem fictícia com latência simulada.</p>
+        <button data-action="/api/usuarios">Listar usuários</button>
+      </article>
+
+      <article class="card">
+        <h2>🛒 Pedido</h2>
+        <p>Cria pedido fictício + processa pagamento (~18% recusados).</p>
+        <button data-action="/api/pedido" data-method="POST">Criar pedido</button>
+      </article>
+
+      <article class="card">
+        <h2>📋 Últimos pedidos</h2>
+        <p>Lê os pedidos gerados na sessão.</p>
+        <button data-action="/api/pedidos">Listar pedidos</button>
+      </article>
+
+      <article class="card">
+        <h2>🐌 Slow query</h2>
+        <p>Operação propositalmente lenta (1–3s) para enxergar latência.</p>
+        <button data-action="/api/slow">Disparar slow op</button>
+      </article>
+
+      <article class="card danger">
+        <h2>💥 Erro proposital</h2>
+        <p>Lança exceção 500 não tratada para gerar span de erro + log ERROR.</p>
+        <button data-action="/api/erro" class="danger">Quebrar a aplicação</button>
+      </article>
+    </section>
+
+    <section class="output">
+      <div class="output-header">
+        <h2>Saída</h2>
+        <button id="clear">Limpar</button>
+      </div>
+      <pre id="result">Clique em algum botão acima…</pre>
+    </section>
+  </main>
+
+  <footer>
+    <span>Service: <code>workshop-app</code></span>
+    <span>UI: <code>localhost:5000</code></span>
+    <span>SigNoz: <code>localhost:8080</code></span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
