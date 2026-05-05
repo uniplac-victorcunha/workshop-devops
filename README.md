@@ -21,8 +21,8 @@ exportando via OTLP HTTP para o **otel-collector do SigNoz**.
 
 ### 1) Suba o SigNoz primeiro
 
-```powershell
-cd ../signoz/deploy/docker
+```bash
+cd signoz/deploy/docker
 docker compose up -d
 ```
 
@@ -32,8 +32,8 @@ e crie a conta inicial.
 
 ### 2) Suba a aplicação
 
-```powershell
-cd ../../../workshop-app
+```bash
+cd workshop-app
 docker compose up -d --build
 ```
 
@@ -79,7 +79,7 @@ workshop-app/
 
 ## Comandos úteis
 
-```powershell
+```bash
 # Logs da app (também exportados via OTLP)
 docker logs -f workshop-app
 
