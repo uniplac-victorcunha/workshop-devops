@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevOps na Prática — Workshop</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:        #0F1117;
+      --bg-soft:   #161922;
+      --text:      #FFFFFF;
+      --muted:     #9CA3AF;
+      --accent:    #3B82F6;
+      --accent-2:  #F59E0B;
+      --green:     #10B981;
+      --red:       #EF4444;
+      --indigo:    #6366F1;
+      --border:    #2A2F3D;
+    }
+
+    .reveal { font-family: 'Inter', sans-serif; color: var(--text); font-weight: 400; }
+    .reveal .slides { text-align: left; }
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+      font-family: 'Poppins', sans-serif; color: var(--text);
+      text-transform: none; letter-spacing: -0.01em; line-height: 1.15;
+    }
+    .reveal h1 { font-size: 2.6em; font-weight: 700; }
+    .reveal h2 { font-size: 1.9em; font-weight: 600; margin-bottom: 0.3em; }
+    .reveal h3 { font-size: 1.3em; font-weight: 600; color: var(--muted); margin-bottom: 1em; }
+    .reveal p, .reveal li { font-size: 0.85em; line-height: 1.55; }
+    .reveal strong { color: var(--text); font-weight: 600; }
+    .reveal a { color: var(--accent); }
+    .reveal pre { box-shadow: none; font-size: 0.55em; width: 100%; margin: 0.4em 0; }
+    .reveal pre code {
+      font-family: 'JetBrains Mono', monospace;
+      border-radius: 8px; padding: 1em 1.2em; background: #0a0c12;
+      border: 1px solid var(--border); max-height: none;
+    }
+    .reveal section { padding: 0; }
+
+    .reveal .progress { color: var(--accent); }
+    .reveal .controls { color: var(--accent); }
+
+    /* layout helpers */
+    .lead { color: var(--muted); font-size: 0.95em; margin-bottom: 0.6em; }
+    .accent { color: var(--accent); }
+    .accent-2 { color: var(--accent-2); }
+    .small { font-size: 0.7em; color: var(--muted); }
+    .center { text-align: center; }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .row-2x2 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 22px; }
+
+    .card {
+      background: var(--bg-soft); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px 24px;
+    }
+    .card .icon { font-size: 1.6em; margin-bottom: 8px; }
+    .card h4 { font-size: 1.15em; margin: 0 0 6px 0; }
+    .card .q { color: var(--accent); font-style: italic; margin: 0 0 10px 0; font-size: 0.8em; }
+    .card p { margin: 0.25em 0; font-size: 0.78em; }
+    .card .tool { color: var(--muted); font-size: 0.72em; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+
+    .quote-box {
+      border-left: 4px solid var(--accent);
+      background: var(--bg-soft);
+      padding: 18px 24px; border-radius: 6px;
+      font-size: 1em; line-height: 1.5;
+      margin: 10px 0 20px 0;
+    }
+
+    .badge {
+      display: inline-block; padding: 8px 16px; border-radius: 999px;
+      font-size: 0.75em; font-weight: 600; letter-spacing: 0.02em;
+    }
+    .badge-red { background: rgba(239,68,68,0.15); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.4); }
+
+    /* metric cards */
+    .metric { text-align: center; padding: 28px 16px; }
+    .metric .num {
+      font-family: 'Poppins', sans-serif; font-weight: 700;
+      font-size: 3.2em; line-height: 1; margin-bottom: 8px;
+    }
+    .metric .lbl { color: var(--muted); font-size: 0.7em; line-height: 1.4; }
+    .metric:nth-child(1) .num { color: var(--accent); }
+    .metric:nth-child(2) .num { color: var(--accent-2); }
+    .metric:nth-child(3) .num { color: var(--green); }
+    .metric:nth-child(4) .num { color: var(--indigo); }
+
+    /* pipeline */
+    .pipeline { display: flex; align-items: stretch; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+    .pipe-step {
+      flex: 1; min-width: 110px;
+      background: var(--bg-soft); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 10px; text-align: center;
+      position: relative;
+    }
+    .pipe-step.ci { border-color: rgba(59,130,246,0.5); }
+    .pipe-step.cd { border-color: rgba(16,185,129,0.5); }
+    .pipe-step .n { font-size: 0.7em; color: var(--muted); }
+    .pipe-step .name { font-weight: 600; font-size: 0.85em; margin: 6px 0 2px; }
+    .pipe-step .desc { font-size: 0.62em; color: var(--muted); line-height: 1.3; }
+    .legend { margin-top: 14px; display: flex; gap: 24px; font-size: 0.7em; color: var(--muted); }
+    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .dot.blue { background: var(--accent); }
+    .dot.green { background: var(--green); }
+
+    /* dialog bubbles */
+    .bubble { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; margin: 10px 0; font-size: 0.85em; }
+    .bubble.dev { border-color: rgba(59,130,246,0.4); margin-right: 25%; }
+    .bubble.ops { border-color: rgba(245,158,11,0.4); margin-left: 25%; }
+    .bubble .who { font-size: 0.7em; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+
+    /* transition slides */
+    .transition { height: 100%; display: flex; flex-direction: column; justify-content: center; padding-left: 80px; position: relative; }
+    .transition .bignum {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-family: 'Poppins', sans-serif; font-weight: 700;
+      font-size: 22em; opacity: 0.1; color: white; line-height: 1; pointer-events: none;
+    }
+    .transition h1 { font-size: 3em; position: relative; z-index: 1; }
+    .transition h3 { color: rgba(255,255,255,0.85); position: relative; z-index: 1; }
+    section.transition-blue { background: var(--accent); }
+    section.transition-orange { background: var(--accent-2); }
+    section.transition-green { background: var(--green); }
+    section.transition-indigo { background: var(--indigo); }
+
+    /* venn */
+    .venn { display: flex; justify-content: center; align-items: center; height: 200px; position: relative; margin: 10px 0 24px; }
+    .venn .circle {
+      width: 200px; height: 200px; border-radius: 50%; opacity: 0.75;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.6em;
+      position: absolute;
+    }
+    .venn .dev { background: var(--accent); left: calc(50% - 160px); }
+    .venn .ops { background: var(--accent-2); left: calc(50% - 40px); }
+    .venn .label-mid {
+      position: absolute; left: 50%; transform: translate(-50%, 0);
+      top: calc(50% - 18px); z-index: 5;
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.1em;
+      color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+
+    /* compare */
+    .compare-col { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .compare-col h4 { font-size: 1.1em; margin: 0 0 10px 0; }
+    .compare-col ul { list-style: none; padding: 0; margin: 0; }
+    .compare-col li { font-size: 0.78em; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+    .compare-col li:last-child { border-bottom: 0; }
+    .compare-col.vm { border-top: 3px solid var(--accent-2); }
+    .compare-col.docker { border-top: 3px solid var(--accent); }
+
+    /* lab steps */
+    .lab-step { display: flex; gap: 16px; margin: 10px 0; align-items: flex-start; }
+    .lab-step .circle {
+      flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Poppins', sans-serif; font-weight: 700;
+    }
+    .lab-step.highlight .circle { background: var(--accent-2); }
+    .lab-step .content { flex: 1; }
+    .lab-step h4 { margin: 0 0 6px 0; font-size: 0.9em; }
+    .lab-step pre { margin: 4px 0; font-size: 0.5em; }
+    .lab-step .note { font-size: 0.7em; color: var(--muted); font-style: italic; }
+
+    /* hub */
+    .hub { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+    .hub .tool-card { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .hub .tool-card h4 { margin: 0 0 4px 0; font-size: 0.95em; color: var(--accent); }
+    .hub .tool-card p { margin: 0; font-size: 0.72em; color: var(--muted); line-height: 1.4; }
+
+    /* checklist */
+    .checklist { list-style: none; padding: 0; }
+    .checklist li { padding: 8px 0; font-size: 0.85em; }
+    .checklist li::before { content: "✓"; color: var(--green); font-weight: 700; margin-right: 12px; }
+
+    .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
+    .timeline .step { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .timeline .when { color: var(--accent); font-weight: 600; font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.04em; }
+    .timeline .what { font-size: 0.78em; margin-top: 6px; line-height: 1.4; }
+
+    /* cover */
+    .cover { padding-left: 80px; padding-top: 60px; }
+    .cover h1 { font-size: 3.4em; margin-bottom: 6px; }
+    .cover .sub { font-size: 1.15em; color: var(--muted); margin-bottom: 50px; }
+    .cover .meta { font-size: 0.8em; color: var(--muted); }
+    .cover .agenda { margin-top: 30px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 0.75em; color: var(--muted); }
+    .cover .agenda .pill { background: var(--bg-soft); border: 1px solid var(--border); padding: 6px 14px; border-radius: 999px; }
+    .cover .arrow { color: var(--accent); font-weight: 700; }
+
+    /* qa slide */
+    .qa { padding: 80px; text-align: center; }
+    .qa h1 { font-size: 4em; margin-bottom: 20px; }
+    .qa .contact { margin-top: 40px; font-size: 0.85em; color: var(--muted); }
+    .qa .contact div { margin: 8px 0; }
+    .qa .qrbox {
+      width: 140px; height: 140px; background: var(--bg-soft); border: 2px dashed var(--border);
+      margin: 30px auto 16px; display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 0.7em;
+    }
+
+    /* ascii pipeline graphic on cover */
+    .cover-graphic {
+      position: absolute; right: 60px; bottom: 60px;
+      display: flex; align-items: center; gap: 16px; opacity: 0.6;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7em; color: var(--muted);
+    }
+    .cover-graphic .box {
+      border: 1px solid var(--accent); padding: 8px 12px; border-radius: 6px;
+    }
+    .cover-graphic .arrow { color: var(--accent); }
+
+    /* footnote */
+    .footnote { margin-top: 18px; font-size: 0.65em; color: var(--muted); font-style: italic; }
+  </style>
+</head>
+<body style="background: var(--bg);">
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ========== SLIDE 1 - Capa ========== -->
+    <section data-background-color="#0F1117">
+      <div class="cover">
+        <h1>DevOps na <span class="accent">Prática</span></h1>
+        <p class="sub">Containers, Observabilidade e como o software chega ao usuário</p>
+
+        <div class="meta">
+          <div>Curso de Sistemas de Informação · Workshop</div>
+          <div style="margin-top: 6px;">Victor da Cunha · 05/05/2026</div>
+        </div>
+
+        <div class="agenda">
+          <span class="pill">Teoria · 20'</span>
+          <span class="arrow">→</span>
+          <span class="pill">Containers · 18'</span>
+          <span class="arrow">→</span>
+          <span class="pill">Observabilidade · 22'</span>
+          <span class="arrow">→</span>
+          <span class="pill" style="border-color: var(--accent);">Lab · 30'</span>
+        </div>
+
+        <div class="cover-graphic">
+          <span class="box">&lt;/&gt; código</span>
+          <span class="arrow">→</span>
+          <span class="box">📦 container</span>
+          <span class="arrow">→</span>
+          <span class="box">📊 monitoramento</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 2 - Problema central ========== -->
+    <section>
+      <h2>"Funciona na minha máquina!"</h2>
+      <h3>O problema que originou o DevOps</h3>
+
+      <div style="margin-top: 20px;">
+        <div class="bubble dev">
+          <div class="who">👨‍💻 DEV</div>
+          Está funcionando aqui, pode subir em produção!
+        </div>
+        <div class="bubble ops">
+          <div class="who">⚙️ OPS</div>
+          Subiu e quebrou tudo. Sistema fora do ar.
+        </div>
+        <div class="bubble dev">
+          <div class="who">👨‍💻 DEV</div>
+          Mas na <em>minha máquina</em> funciona...
+        </div>
+      </div>
+
+      <div style="margin-top: 18px; display: flex; gap: 30px; font-size: 0.78em; color: var(--muted);">
+        <div>❌ Usuário insatisfeito, sistema indisponível</div>
+        <div>❌ Times que se culpam em vez de resolver</div>
+      </div>
+
+      <p class="footnote" style="margin-top: 20px; color: var(--accent-2);">
+        💬 Quem aqui já passou por algo parecido em projetos da faculdade?
+      </p>
+    </section>
+
+    <!-- ========== SLIDE 3 - TRANSIÇÃO 01 ========== -->
+    <section class="transition-blue">
+      <div class="transition">
+        <span class="bignum">01</span>
+        <h3>Parte 1 de 4</h3>
+        <h1>O que é DevOps?</h1>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 4 - Definição ========== -->
+    <section>
+      <h2>DevOps = Desenvolvimento + Operações</h2>
+      <h3>Uma cultura, não uma ferramenta</h3>
+
+      <div class="quote-box">
+        DevOps une os times de Dev e Ops com práticas e ferramentas que aceleram a entrega de software <strong>sem sacrificar a qualidade</strong>.
+      </div>
+
+      <div class="venn">
+        <div class="circle dev">Dev</div>
+        <div class="circle ops">Ops</div>
+        <div class="label-mid">DevOps</div>
+      </div>
+
+      <div class="row-3" style="margin-top: 10px;">
+        <div class="card center">
+          <div class="icon">🤝</div>
+          <h4>Cultura</h4>
+          <p class="small">Pessoas colaborando</p>
+        </div>
+        <div class="card center">
+          <div class="icon">⚙️</div>
+          <h4>Automação</h4>
+          <p class="small">Menos trabalho manual</p>
+        </div>
+        <div class="card center">
+          <div class="icon">📡</div>
+          <h4>Monitoramento</h4>
+          <p class="small">Saber o que acontece</p>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 18px;">
+        <span class="badge badge-red">⚠ DevOps NÃO é um cargo. É uma forma de trabalhar.</span>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 5 - O que é CI/CD (conceito) ========== -->
+    <section>
+      <h2>CI/CD — automatizando o caminho até o usuário</h2>
+      <h3>A resposta do DevOps para o "funciona na minha máquina"</h3>
+
+      <p style="font-size: 0.82em; color: var(--muted); margin-bottom: 18px;">
+        Em vez de fazer build, testar e subir <em>manualmente</em> (e torcer pra dar certo),
+        a equipe configura uma <strong style="color: var(--text);">esteira automática</strong> que faz isso a cada alteração de código.
+      </p>
+
+      <div class="row-2" style="margin-top: 8px;">
+        <div class="compare-col" style="border-top: 3px solid var(--accent);">
+          <h4>🔄 CI — Continuous Integration</h4>
+          <p style="font-size: 0.78em; color: var(--accent); margin: 0 0 8px;"><em>"Integrar código com frequência"</em></p>
+          <p style="font-size: 0.76em; color: var(--muted); line-height: 1.5;">
+            Toda vez que um dev faz <strong style="color: var(--text);">commit</strong>, o sistema <strong style="color: var(--text);">compila e roda os testes sozinho</strong>.
+            Se algo quebra, o time sabe em minutos — não em semanas.
+          </p>
+          <p style="font-size: 0.72em; color: var(--muted); margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 8px;">
+            <strong style="color: var(--accent);">Resolve:</strong> "ninguém viu que meu código quebrou o do colega"
+          </p>
+        </div>
+
+        <div class="compare-col" style="border-top: 3px solid var(--green);">
+          <h4>🚀 CD — Continuous Delivery</h4>
+          <p style="font-size: 0.78em; color: var(--green); margin: 0 0 8px;"><em>"Entregar com frequência e confiabilidade"</em></p>
+          <p style="font-size: 0.76em; color: var(--muted); line-height: 1.5;">
+            Se o código passa em todos os testes, ele <strong style="color: var(--text);">já fica pronto para subir em produção</strong> — sem reuniões, sem "sextou".
+            Em alguns times, sobe automaticamente.
+          </p>
+          <p style="font-size: 0.72em; color: var(--muted); margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 8px;">
+            <strong style="color: var(--green);">Resolve:</strong> "tenho medo de subir em produção"
+          </p>
+        </div>
+      </div>
+
+      <p class="footnote" style="text-align: center; margin-top: 18px; font-size: 0.78em; color: var(--text); font-style: normal;">
+        💡 Juntos, CI + CD formam um <strong>pipeline</strong> — uma sequência de etapas automáticas. <span class="accent">Vamos ver o pipeline →</span>
+      </p>
+    </section>
+
+    <!-- ========== SLIDE 6 - Pipeline CI/CD (visualização) ========== -->
+    <section>
+      <h2>O pipeline na prática</h2>
+      <h3>Um único commit dispara tudo isso — sem ninguém apertar botão</h3>
+
+      <div class="pipeline">
+        <div class="pipe-step ci">
+          <div class="n">01</div>
+          <div class="name">📝 Commit</div>
+          <div class="desc">Dev sobe código no Git</div>
+        </div>
+        <div class="pipe-step ci">
+          <div class="n">02</div>
+          <div class="name">🔨 Build</div>
+          <div class="desc">Sistema compila o código</div>
+        </div>
+        <div class="pipe-step ci">
+          <div class="n">03</div>
+          <div class="name">🧪 Testes</div>
+          <div class="desc">Validação automática</div>
+        </div>
+        <div class="pipe-step ci">
+          <div class="n">04</div>
+          <div class="name">🔍 Review</div>
+          <div class="desc">Análise de qualidade</div>
+        </div>
+        <div class="pipe-step cd">
+          <div class="n">05</div>
+          <div class="name">🚧 Staging</div>
+          <div class="desc">Ambiente de homologação</div>
+        </div>
+        <div class="pipe-step cd">
+          <div class="n">06</div>
+          <div class="name">🚀 Produção</div>
+          <div class="desc">Chega ao usuário</div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div><span class="dot blue"></span><strong>CI</strong> (etapas 1–4) — verifica que o código novo não quebrou nada</div>
+        <div><span class="dot green"></span><strong>CD</strong> (etapas 5–6) — leva o código testado até o usuário final</div>
+      </div>
+
+      <p class="footnote" style="margin-top: 16px; font-size: 0.74em;">
+        🎓 <strong style="color: var(--text);">Analogia:</strong> imagine se cada vez que você enviasse um trabalho ao professor,
+        um robô conferisse referências, ABNT e plágio antes dele receber. Isso é CI/CD aplicado à faculdade.
+      </p>
+    </section>
+
+    <!-- ========== SLIDE 7 - Impacto DORA ========== -->
+    <section>
+      <h2>"Tudo bem, mas isso funciona mesmo?"</h2>
+      <h3>Dados do relatório DORA — comparando times que usam DevOps vs. times tradicionais</h3>
+
+      <div class="row-2x2" style="margin-top: 18px;">
+        <div class="card metric">
+          <div class="num">973×</div>
+          <div class="lbl">mais rápido para fazer deploy<br>(times elite vs. comuns)</div>
+        </div>
+        <div class="card metric">
+          <div class="num">24×</div>
+          <div class="lbl">menor taxa de falha<br>em produção</div>
+        </div>
+        <div class="card metric">
+          <div class="num">1h</div>
+          <div class="lbl">tempo médio de recuperação<br>de incidentes (times elite)</div>
+        </div>
+        <div class="card metric">
+          <div class="num">200×</div>
+          <div class="lbl">mais frequência de deploys<br>por ano</div>
+        </div>
+      </div>
+
+      <p class="footnote" style="margin-top: 16px;">
+        📚 Fonte: DORA State of DevOps Report — pesquisa anual com 33.000+ profissionais, publicada pelo Google Cloud.
+        <br><span style="color: var(--text);">Conclusão:</span> entregar mais rápido <strong style="color: var(--text);">não</strong> significa mais bugs — significa menos.
+      </p>
+    </section>
+
+    <!-- ========== SLIDE 7 - TRANSIÇÃO 02 ========== -->
+    <section class="transition-orange">
+      <div class="transition">
+        <span class="bignum">02</span>
+        <h3>Parte 2 de 4</h3>
+        <h1>Containers e Docker</h1>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 8 - O que é container ========== -->
+    <section>
+      <h2>Containers — a marmita do software</h2>
+      <h3>O fim do "funciona na minha máquina"</h3>
+
+      <p style="font-size: 0.8em; color: var(--muted); margin-bottom: 14px;">
+        O CI/CD automatiza o <em>caminho</em>. Mas e se a versão do Node do seu notebook for diferente da do servidor?
+        E se faltar uma biblioteca? <strong style="color: var(--text);">É aqui que entram os containers.</strong>
+      </p>
+
+      <div class="quote-box" style="border-left-color: var(--accent-2);">
+        Um container é como uma <strong>marmita</strong> 🍱. Você coloca o código, as dependências e as configurações juntos numa caixa fechada. Essa marmita funciona <strong>igualzinho</strong> no seu notebook, no servidor da empresa e na nuvem.
+      </div>
+
+      <div class="row-2" style="margin-top: 12px;">
+        <div class="compare-col vm">
+          <h4>🏢 Máquina Virtual (VM)</h4>
+          <ul>
+            <li>Sistema operacional <strong>completo</strong> dentro</li>
+            <li>Tamanho: <strong>vários GB</strong></li>
+            <li>Inicialização: <strong>~2 minutos</strong></li>
+            <li><em>Como um prédio inteiro para 1 pessoa</em></li>
+          </ul>
+        </div>
+        <div class="compare-col docker">
+          <h4>📦 Container Docker</h4>
+          <ul>
+            <li>Compartilha o <strong>SO do host</strong></li>
+            <li>Tamanho: <strong>dezenas de MB</strong></li>
+            <li>Inicialização: <strong>segundos</strong></li>
+            <li><em>Como um apartamento: estrutura compartilhada</em></li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="footnote" style="margin-top: 12px; font-size: 0.72em;">
+        💡 Por isso containers e CI/CD andam juntos: o pipeline gera uma <strong style="color: var(--text);">imagem de container</strong>,
+        e essa mesma imagem é a que vai pra produção. Sem surpresas.
+      </p>
+    </section>
+
+    <!-- ========== SLIDE 9 - Docker prática ========== -->
+    <section>
+      <h2>Docker — os comandos essenciais</h2>
+      <h3>Do zero ao container rodando em 3 passos</h3>
+
+      <div style="margin-top: 14px;">
+        <p style="font-size: 0.78em; margin-bottom: 4px;"><strong class="accent">Passo 1</strong> — O <code>Dockerfile</code> (a receita do container):</p>
+<pre><code class="dockerfile" data-trim>FROM node:18-alpine        # imagem base
+WORKDIR /app               # pasta de trabalho
+COPY . .                   # copia o código
+RUN npm install            # instala dependências
+CMD ["node", "server.js"]  # comando para iniciar</code></pre>
+
+        <p style="font-size: 0.78em; margin: 10px 0 4px;"><strong class="accent">Passo 2</strong> — Construir e rodar:</p>
+<pre><code class="bash" data-trim>docker build -t minha-app .        # cria a imagem
+docker run -p 3000:3000 minha-app  # sobe o container</code></pre>
+
+        <p style="font-size: 0.78em; margin: 10px 0 4px;"><strong class="accent">Passo 3</strong> — <code>docker-compose</code> (sobe tudo junto):</p>
+<pre><code class="bash" data-trim>docker-compose up   # frontend + backend + banco de uma vez
+docker ps           # lista o que está rodando
+docker logs api     # vê os logs do container "api"</code></pre>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 10 - TRANSIÇÃO 03 ========== -->
+    <section class="transition-green">
+      <div class="transition">
+        <span class="bignum">03</span>
+        <h3>Parte 3 de 4</h3>
+        <h1>Observabilidade</h1>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 11 - O que é observabilidade ========== -->
+    <section>
+      <h2>Observabilidade — saber o que acontece sem adivinhar</h2>
+      <h3>Você tem 15 containers rodando. Um usuário reclama. E agora?</h3>
+
+      <p style="font-size: 0.8em; color: var(--muted); margin-bottom: 14px;">
+        Containers são ótimos pra rodar muita coisa em paralelo, mas <strong style="color: var(--text);">multiplicam a complexidade</strong>:
+        em vez de 1 sistema pra investigar, você tem 15. Sem ferramentas, virou caça ao tesouro.
+      </p>
+
+      <div class="row-2" style="margin-top: 8px;">
+        <div class="compare-col" style="border-top: 3px solid var(--muted);">
+          <h4>🚦 Monitoramento</h4>
+          <p style="font-size: 0.82em; color: var(--accent); margin: 0 0 6px;"><em>"Está funcionando?"</em> — sim ou não</p>
+          <p style="font-size: 0.74em; color: var(--muted); line-height: 1.5;">Como uma <strong style="color: var(--text);">luz de check-engine</strong> no carro: avisa que tem problema, mas não diz onde nem por quê.</p>
+        </div>
+        <div class="compare-col" style="border-top: 3px solid var(--green);">
+          <h4>🔬 Observabilidade</h4>
+          <p style="font-size: 0.82em; color: var(--green); margin: 0 0 6px;"><em>"O que está acontecendo e por quê?"</em></p>
+          <p style="font-size: 0.74em; color: var(--muted); line-height: 1.5;">Como um <strong style="color: var(--text);">mecânico com aparelho de diagnóstico</strong>: vê qual peça, qual falha, desde quando.</p>
+        </div>
+      </div>
+
+      <p class="footnote" style="margin-top: 18px; font-size: 0.78em; color: var(--text); font-style: normal; text-align: center;">
+        🎯 Observabilidade é a habilidade de <strong>fazer perguntas novas</strong> ao sistema sem precisar mudar o código.
+      </p>
+    </section>
+
+    <!-- ========== SLIDE 12 - 3 pilares ========== -->
+    <section>
+      <h2>Os 3 pilares da observabilidade</h2>
+      <h3>Cada um responde uma pergunta diferente — e juntos, contam a história inteira</h3>
+
+      <div class="row-3" style="margin-top: 16px;">
+        <div class="card" style="border-top: 3px solid var(--accent);">
+          <div class="icon">📊</div>
+          <h4>Métricas</h4>
+          <p class="q">"O quê está acontecendo?"</p>
+          <p>Números ao longo do tempo. <strong>Servem para detectar.</strong></p>
+          <p style="color: var(--muted); margin-top: 8px;"><strong>Ex:</strong> CPU em 82%, 1.200 req/s, 5 erros na última hora.</p>
+          <div class="tool">🔧 Prometheus</div>
+        </div>
+
+        <div class="card" style="border-top: 3px solid var(--accent-2);">
+          <div class="icon">📝</div>
+          <h4>Logs</h4>
+          <p class="q" style="color: var(--accent-2);">"O que aconteceu, exatamente?"</p>
+          <p>Registros textuais com timestamp. <strong>Servem para entender.</strong></p>
+          <p style="color: var(--muted); margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.7em;"><strong>[ERROR] 14:32:01</strong> — Falha ao conectar com banco</p>
+          <div class="tool">🔧 Loki</div>
+        </div>
+
+        <div class="card" style="border-top: 3px solid var(--green);">
+          <div class="icon">🔗</div>
+          <h4>Traces</h4>
+          <p class="q" style="color: var(--green);">"Onde foi e qual o caminho?"</p>
+          <p>Rastreamento de uma requisição. <strong>Servem para localizar.</strong></p>
+          <p style="color: var(--muted); margin-top: 8px; font-size: 0.72em;"><strong>Checkout</strong> → Auth (12ms) → Pedidos (8ms) → <strong style="color: var(--red);">Banco (380ms)</strong> ⚠</p>
+          <div class="tool">🔧 Tempo</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 22px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px;">
+        <p style="font-size: 0.75em; color: var(--muted); margin: 0 0 8px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;">🔍 Como os três trabalham juntos numa investigação real:</p>
+        <p style="font-size: 0.78em; color: var(--text); margin: 0; line-height: 1.6;">
+          <span class="accent">Métrica</span> avisa "tempo de resposta subiu 10×"
+          <span style="color: var(--muted);">→</span>
+          <span class="accent-2">Log</span> mostra "erro de conexão com banco às 14:32"
+          <span style="color: var(--muted);">→</span>
+          <span style="color: var(--green);">Trace</span> aponta "requisição travou na chamada ao banco"
+        </p>
+        <p style="font-size: 0.7em; color: var(--muted); margin: 6px 0 0; font-style: italic;">
+          Investigação que durava horas vira <strong style="color: var(--text);">questão de minutos</strong>.
+        </p>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 13 - Stack LGTM ========== -->
+    <section>
+      <h2>As ferramentas que fazem isso acontecer</h2>
+      <h3>Stack LGTM — o padrão open source do mercado</h3>
+
+      <div class="hub">
+        <div class="tool-card" style="border-left: 4px solid var(--accent);">
+          <h4>📊 Prometheus</h4>
+          <p>Coleta e armazena <strong>métricas</strong>. Pergunta aos serviços: "quanto de CPU você está usando?"</p>
+        </div>
+        <div class="tool-card" style="border-left: 4px solid var(--accent-2);">
+          <h4>📝 Loki</h4>
+          <p>Agrega <strong>logs</strong> de todos os containers. "Prometheus, mas para logs." Criado pelo Grafana Labs.</p>
+        </div>
+        <div class="tool-card" style="border-left: 4px solid var(--green);">
+          <h4>🔗 Tempo</h4>
+          <p>Registra o <strong>caminho das requisições</strong>. Mostra onde cada millisegundo foi gasto.</p>
+        </div>
+        <div class="tool-card" style="border-left: 4px solid var(--indigo); background: linear-gradient(135deg, rgba(99,102,241,0.15), var(--bg-soft));">
+          <h4 style="color: var(--indigo);">📺 Grafana</h4>
+          <p>O <strong>painel que une tudo</strong>. Conecta Prometheus + Loki + Tempo em um único dashboard.</p>
+        </div>
+      </div>
+
+      <p class="footnote" style="text-align: center; margin-top: 20px; color: var(--text); font-size: 0.78em; font-style: normal;">
+        ✨ Tudo open source e gratuito. Usado por <strong>CERN, PayPal, eBay</strong> e mais de <strong>20 milhões de usuários</strong>.
+        <br><span style="color: var(--accent);">No lab daqui a pouco, você vai abrir o Grafana e ver métricas reais saindo dos seus containers. →</span>
+      </p>
+    </section>
+
+    <!-- ========== SLIDE 14 - TRANSIÇÃO 04 ========== -->
+    <section class="transition-indigo">
+      <div class="transition">
+        <span class="bignum">04</span>
+        <h3>Parte 4 de 4</h3>
+        <h1>Laboratório Prático</h1>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 15 - Guia do lab ========== -->
+    <section>
+      <h2>Siga o roteiro 🧪</h2>
+      <h3>Todos os comandos que você precisa estão aqui</h3>
+
+      <div style="margin-top: 10px;">
+        <div class="lab-step">
+          <div class="circle" style="background: var(--muted);">0</div>
+          <div class="content">
+            <h4>Clonar o repositório do workshop</h4>
+<pre><code class="bash" data-trim>git clone https://github.com/uniplac-victorcunha/workshop-devops
+cd workshop-devops</code></pre>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="circle">1</div>
+          <div class="content">
+            <h4>Subir o SigNoz (plataforma de observabilidade)</h4>
+<pre><code class="bash" data-trim>cd signoz/deploy/docker
+docker compose up -d</code></pre>
+            <p class="note">Aguarde ~1–2 min. Acesse <strong style="color: var(--accent);">http://localhost:8080</strong> e crie a conta inicial</p>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="circle">2</div>
+          <div class="content">
+            <h4>Subir a aplicação de demonstração</h4>
+<pre><code class="bash" data-trim>cd workshop-app
+docker compose up -d --build</code></pre>
+            <p class="note">App disponível em <strong style="color: var(--accent);">http://localhost:5000</strong></p>
+          </div>
+        </div>
+
+        <div class="lab-step highlight">
+          <div class="circle">3</div>
+          <div class="content">
+            <h4>Verificar a telemetria no SigNoz</h4>
+            <p style="font-size: 0.78em; margin: 4px 0;">Acesse: <code style="color: var(--accent);">http://localhost:8080</code></p>
+            <p class="note">Services → <strong>workshop-app</strong> aparece em ~30s · Traces · Logs · Metrics → busque <code>workshop.*</code></p>
+          </div>
+        </div>
+
+        <div class="lab-step highlight">
+          <div class="circle">4</div>
+          <div class="content">
+            <h4>Disparar cenários pela aplicação 💥</h4>
+            <p style="font-size: 0.78em; margin: 4px 0;">Na UI em <code style="color: var(--accent);">localhost:5000</code>, clique nos botões:</p>
+            <p class="note"><strong>Criar pedido</strong> → trace composto · <strong>Quebrar a aplicação</strong> → span ERROR · <strong>Disparar slow op</strong> → latência alta</p>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="circle">5</div>
+          <div class="content">
+            <h4>Correlacionar trace + log + métrica</h4>
+            <p class="note">No SigNoz: Traces → clique num trace com ERROR → veja o log correlacionado pelo <code>trace_id</code></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 16 - Recap + próximos passos ========== -->
+    <section>
+      <h2>Você acabou de fazer o que times de engenharia fazem todos os dias</h2>
+      <h3>E isso é só o começo</h3>
+
+      <h4 style="margin-top: 18px; font-size: 0.95em; color: var(--accent);">O que você praticou hoje:</h4>
+      <ul class="checklist">
+        <li>Subiu uma aplicação com múltiplos containers usando Docker</li>
+        <li>Monitorou métricas, traces e logs em tempo real no SigNoz</li>
+        <li>Provocou erros e latência e correlacionou os sinais de observabilidade</li>
+        <li>Entendeu o ciclo completo: <strong>código → container → monitoramento</strong></li>
+      </ul>
+
+      <h4 style="margin-top: 18px; font-size: 0.95em; color: var(--accent-2);">Próximos passos:</h4>
+      <div class="timeline">
+        <div class="step">
+          <div class="when">Hoje</div>
+          <div class="what">Rode <code>docker run nginx</code> e abra <code>localhost:80</code></div>
+        </div>
+        <div class="step">
+          <div class="when">Esta semana</div>
+          <div class="what">Explore o <strong>Play with Docker</strong> (online, sem instalar)</div>
+        </div>
+        <div class="step">
+          <div class="when">Este mês</div>
+          <div class="what">Leia <strong>"The Phoenix Project"</strong> (é um romance, não livro técnico)</div>
+        </div>
+        <div class="step">
+          <div class="when">Certificações</div>
+          <div class="what">Docker Certified · CKA (Kubernetes) · AWS Cloud Practitioner</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SLIDE 17 - Q&A ========== -->
+    <section>
+      <div class="qa">
+        <h1>Perguntas?</h1>
+        <p style="color: var(--muted); font-size: 1em;">— vamos conversar —</p>
+
+        <!-- <div class="qrbox">QR<br>repositório</div> -->
+
+        <div class="contact">
+          <div>📧 victor.cunha@ndd.tech</div>
+          <div>💼 www.linkedin.com/in/victordacunhaa</div>
+          <div>🔗 https://github.com/uniplac-victorcunha/workshop-devops</div>
+        </div>
+
+        <p style="margin-top: 50px; font-size: 0.8em; color: var(--accent);">
+          Se o ambiente ainda estiver rodando na sua máquina,<br>continue explorando.
+        </p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.06,
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    plugins: [ RevealHighlight ]
+  });
+</script>
+
+</body>
+</html>
