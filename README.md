@@ -17,6 +17,19 @@ exportando via OTLP HTTP para o **otel-collector do SigNoz**.
 - **Métricas customizadas**: `workshop.pedidos.criados`, `workshop.pagamentos.processados`,
   `workshop.pagamentos.falhas`, `workshop.pedido.valor` (histograma), `workshop.requisicoes`.
 
+## Pré-requisitos
+
+- **Git** — para clonar o repositório
+- **Docker** — uma das opções abaixo:
+  - **Windows/Mac:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) com WSL 2 backend habilitado
+  - **Linux:** Docker Engine + Docker Compose plugin (`sudo apt install docker.io docker-compose-plugin`)
+  - **WSL (Windows Subsystem for Linux):** Docker instalado dentro do WSL 2 — execute tudo dentro do terminal WSL
+- **WSL 2** *(Windows)* — necessário para rodar Docker no Windows sem Docker Desktop; certifique-se de que a versão 2 está ativa (`wsl --set-default-version 2`)
+- **Portas livres:** `8080` (SigNoz UI) e `5000` (workshop-app)
+- **Memória:** mínimo 4 GB disponíveis para o Docker (o SigNoz sobe vários containers)
+
+> **Dica Windows:** abra o Docker Desktop antes de qualquer `docker compose` e confirme que o ícone da baleia está verde na bandeja do sistema.
+
 ## Como subir
 
 ### 1) Suba o SigNoz primeiro
